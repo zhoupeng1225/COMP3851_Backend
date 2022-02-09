@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const dbconfig = {
   user: process.env.user,
   password: process.env.password,
