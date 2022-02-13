@@ -21,7 +21,7 @@ class DegreeController {
       res.json({ status: "success", results, rowsAffected: rowsAffected[0] });
     } catch (error) {
       console.log(error);
-      res.json({ status: "failed", message: error.message });
+      res.status(404).json({ status: "failed", message: error.message });
     }
   }
   static async getDegreeById(req, res, next) {
@@ -38,7 +38,7 @@ class DegreeController {
       res.json({ result: recordset[0], rowsAffected: rowsAffected[0] });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ status: "failed", message: error.message });
+      res.status(404).json({ status: "failed", message: error.message });
     }
   }
   static async addDegree(req, res, next) {
@@ -58,7 +58,7 @@ class DegreeController {
 
       res.json({ status: "success" });
     } catch (error) {
-      res.status(400).json({ status: "failed", error: error.message });
+      res.status(409).json({ status: "failed", error: error.message });
     }
   }
   static async updateDegree(req, res, next) {
@@ -81,7 +81,7 @@ class DegreeController {
       if (result.rowsAffected[0] === 0) throw Error("Degree ID not found"); //if update not occured
       res.json({ status: "success" });
     } catch (error) {
-      res.status(400).json({ status: "failed", error: error.message });
+      res.status(409).json({ status: "failed", error: error.message });
     }
   }
   static async getDegreeCourse(req, res, next) {
@@ -174,7 +174,7 @@ class DegreeController {
       res.json({ Degree_ID: degreeId, result: courseList });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ status: "failed", error: error.message });
+      res.status(404).json({ status: "failed", error: error.message });
     }
   }
   static async addDegreeCourse(req, res, next) {
@@ -195,7 +195,7 @@ class DegreeController {
       res.json({ status: "success" });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ status: "failed", error: error.message });
+      res.status(409).json({ status: "failed", error: error.message });
     }
   }
   static async deleteDegreeCourse(req, res, next) {
@@ -215,7 +215,7 @@ class DegreeController {
         );
       res.json({ status: "success" });
     } catch (error) {
-      res.status(400).json({ status: "failed", error: error.message });
+      res.status(404).json({ status: "failed", error: error.message });
     }
   }
 }
