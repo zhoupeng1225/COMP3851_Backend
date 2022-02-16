@@ -1,13 +1,13 @@
 const DegreeController = require("../Controller/DegreeController");
-
+const authenticate = require("../Middleware/authenticate");
 const DegreeRouter = require("express").Router();
 DegreeRouter.get("/:degreeId", DegreeController.getDegreeById);
 DegreeRouter.route("/")
   .get(DegreeController.getDegreeByCampus)
-  .post(DegreeController.addDegree)
-  .put(DegreeController.updateDegree);
+  .post(authenticate, DegreeController.addDegree)
+  .put(authenticate, DegreeController.updateDegree);
 DegreeRouter.route("/:degreeId/course")
   .get(DegreeController.getDegreeCourse)
-  .post(DegreeController.addDegreeCourse)
-  .delete(DegreeController.deleteDegreeCourse);
+  .post(authenticate, DegreeController.addDegreeCourse)
+  .delete(authenticate, DegreeController.deleteDegreeCourse);
 module.exports = DegreeRouter;
