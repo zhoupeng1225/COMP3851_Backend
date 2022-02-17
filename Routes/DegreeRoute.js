@@ -3,7 +3,7 @@ const authenticate = require("../Middleware/authenticate");
 const DegreeRouter = require("express").Router();
 DegreeRouter.get("/:degreeId", DegreeController.getDegreeById);
 DegreeRouter.route("/")
-  .get(DegreeController.getDegreeByCampus)
+  .get(DegreeController.getDegree)
   .post(authenticate, DegreeController.addDegree)
   .put(authenticate, DegreeController.updateDegree);
 DegreeRouter.route("/:degreeId/course")

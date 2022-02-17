@@ -44,6 +44,10 @@ class AdminController {
       res.status(401).json({ status: "failed", error: error.message });
     }
   }
+  static async adminLogout(req, res, next) {
+    req.session.user = null;
+    res.json({ status: "successfully log out" });
+  }
 }
 
 module.exports = AdminController;

@@ -171,7 +171,7 @@ class CourseController {
           "INSERT INTO Course_Availability VALUES(@Campus_Id,@Course_Id,@Year,@Semester) " +
             "SELECT SCOPE_IDENTITY() AS id;"
         );
-      console.log(result);
+
       res.json({ status: "success", insertedId: result.recordset[0].id });
     } catch (error) {
       res.status(409).json({ status: "failed", error: error.message });
