@@ -2,10 +2,31 @@ const { poolPromise, sql } = require("../database.js");
 class CourseController {
   static async getCourseList(req, res, next) {
     try {
+      let { search, level, unit } = req.query;
+
       const pool = await poolPromise;
-      const result = await pool
-        .request()
-        .query("SELECT Course_ID,Course_Name FROM Course");
+      let result;
+      let queryString = "SELECT Course_ID,Course_Name FROM Course "; //general query
+      if (search && search != "") {
+        //if search variable exist, search by id and name
+        search = "%" + search + "%";
+        queryString += `WHERE Course_ID LIKE '${search}' OR Course_Name LIKE '${search}' `;
+      } else if (level || unit) {
+        if (level && unit)
+          //get record by both of the field
+          queryString += `WHERE SUBSTRING(Course_ID,5,1) IN (${level.map(
+            (lvl) => `'${lvl.replace(/0/g, "")}'` //replace all 0 with empty string eg it will find all course with id that have specific integer value at 5th position
+          )}) AND Unit in (${unit.map((u) => `'${u}'`)})`;
+        else if (level)
+          //get by level field
+          queryString += `WHERE SUBSTRING(Course_ID,5,1) IN (${level.map(
+            (lvl) => `'${lvl.replace(/0/g, "")}'`
+          )})`;
+        //get by unit field
+        else queryString += `WHERE Unit in (${unit.map((u) => `'${u}'`)})`;
+      }
+      result = await pool.request().query(queryString);
+
       const { recordset, rowsAffected } = result;
 
       res.json({ result: recordset, rowsAffected: rowsAffected[0] });
@@ -33,8 +54,7 @@ class CourseController {
   }
   static async updateCourse(req, res, next) {
     try {
-      const courseId = req.params.courseId;
-      const { courseName, unit, requiredUnit } = req.body;
+      const { courseId, courseName, unit, requiredUnit } = req.body;
       const pool = await poolPromise;
       const result = await pool
         .request()
@@ -70,13 +90,16 @@ class CourseController {
   }
   static async deleteCourseById(req, res, next) {
     try {
-      const courseId = req.params.courseId;
+      const { courseIds } = req.query;
       const pool = await poolPromise;
       const result = await pool
         .request()
-        .input("Course_Id", courseId)
-        .query("DELETE FROM Course WHERE Course_ID = @Course_Id");
-      if (result.rowsAffected[0] === 0) throw Error("Course ID not found");
+        .query(
+          `DELETE FROM Course WHERE Course_ID in (${courseIds.map(
+            (id) => `'${id}'`
+          )})`
+        );
+
       res.json({ status: "success" });
     } catch (error) {
       res.status(404).json({ status: "failed", error: error.message });
@@ -193,6 +216,28 @@ class CourseController {
       if (result.rowsAffected[0] === 0)
         throw Error("Availability ID not found");
       res.json({ status: "success" });
+    } catch (error) {
+      res.status(404).json({ status: "failed", error: error.message });
+    }
+  }
+  static async getFilterOptions(req, res, next) {
+    try {
+      const pool = await poolPromise;
+      const result = await pool
+        .request()
+        .query(
+          "SELECT DISTINCT(SUBSTRING(Course_ID,5,1)) as Level FROM Course;" +
+            "SELECT DISTINCT(Unit) as Unit FROM Course;"
+        );
+
+      let [Level, Unit] = result.recordsets;
+      Level = Level.map((item) => item.Level + "000");
+      Unit = Unit.map((item) => item.Unit);
+      const response = [
+        { name: "Level", options: Level },
+        { name: "Unit", options: Unit },
+      ];
+      res.json({ result: response });
     } catch (error) {
       res.status(404).json({ status: "failed", error: error.message });
     }

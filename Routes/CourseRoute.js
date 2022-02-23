@@ -3,11 +3,12 @@ const authenticate = require("../Middleware/authenticate");
 const CourseRouter = require("express").Router();
 CourseRouter.route("/")
   .get(CourseController.getCourseList)
-  .post(authenticate, CourseController.addCourse);
-CourseRouter.route("/:courseId")
-  .get(CourseController.getCourseById)
+  .post(authenticate, CourseController.addCourse)
   .put(authenticate, CourseController.updateCourse)
   .delete(authenticate, CourseController.deleteCourseById);
+CourseRouter.get("/filterOptions", CourseController.getFilterOptions);
+CourseRouter.route("/:courseId").get(CourseController.getCourseById);
+
 CourseRouter.route("/:courseId/AssumedKnowledge")
   .get(CourseController.getAssumedKnowledge)
   .post(authenticate, CourseController.addAssumedKnowledge)

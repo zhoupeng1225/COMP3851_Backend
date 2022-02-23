@@ -48,6 +48,9 @@ class AdminController {
     req.session.user = null;
     res.json({ status: "successfully log out" });
   }
+  static getAdmin(req, res, next) {
+    res.json({ ...req.session.user });
+  }
 }
 
 module.exports = AdminController;
